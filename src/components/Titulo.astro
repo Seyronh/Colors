@@ -1,0 +1,30 @@
+---
+const GameName = "COLORS";
+const letters = GameName.split("");
+---
+<div>
+{letters.map((e,i) => <h1>{e}</h1>)}
+</div>
+<script define:vars={{ letters }}>
+    const elements = document.querySelectorAll("h1")
+    const colors = []
+    function animate(timestamp){
+        colors.push(`rgb(${Math.random()*255},${Math.random()*255},${Math.random()*255})`)
+        if(colors.length>letters.length) colors.shift()
+        elements.forEach((e,i) => {
+            e.style.color = colors[i]
+        })
+        setTimeout(() => {
+            requestAnimationFrame(animate)
+        },500)
+    }
+    requestAnimationFrame(animate)
+</script>
+<style>
+    div {
+        display: flex;
+        margin-left: auto;
+	    margin-right: auto;
+        justify-content: center;
+    }
+</style>
