@@ -1,20 +1,31 @@
 ---
+//Imports
+
+//Estilo
+import '@styles/global.css';
+
+//Funciones
 import {getLanguages} from "@scripts/i18n/getLanguages";
+import {useTranslations} from "@scripts/i18n/utils";
+
+//Componentes
+import Header from "@components/Header.astro"
+import Titulo from "@components/Titulo.astro"
+import Juego from "@components/Juego.astro"
+
+//Codigo
 export function getStaticPaths(){
 	return getLanguages();
 };
 const { language } = Astro.params;
-import {useTranslations} from "@scripts/i18n/utils";
 //@ts-expect-error
 const t = useTranslations(language);
-
-import Header from "@components/Header.astro"
 
 ---
 
 <html lang=`${language}`>
     <Header title={t("game")} />
     <body>
-        <h1>{language}</h1>
+        <Juego/>
     </body>
 </html>

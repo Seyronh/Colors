@@ -1,0 +1,80 @@
+---
+
+---
+<div class="score"> <p>Puntuación:</p><p class="scorenumber">0</p> </div>
+
+<div class="grid">
+    <div class="square"></div><div class="square"></div><div class="square"></div>
+    <div class="square"></div><div class="square fake"></div><div class="square"></div>
+    <div class="square"></div><div class="square"></div><div class="square"></div>
+</div>
+
+<script>
+
+    let Squares = document.querySelectorAll<HTMLElement>(".square");
+    const ScoreNumber = document.querySelector(".scorenumber");
+    let score = 0;
+
+    function actualizarPuntuacion(){
+        ScoreNumber!.textContent = score.toString();
+    }
+
+    function generarColor(){
+        return [Math.random()*360, 50, Math.floor(Math.random() * (75 - 25 + 1) + 25)]
+    }
+
+    Squares.forEach((square) => {
+        square.addEventListener('click',() => {
+            if(square.classList.contains("fake")){
+                score++;
+            } else {
+                score = 0;
+            }
+            actualizarPuntuacion();
+            reiniciar();
+        })
+    })
+    function reiniciar(){
+        const color = generarColor();
+        const newFake = Math.floor(Math.random()*Squares.length);
+        Squares.forEach((square,index) => {
+            square.classList.remove("fake");
+            if(index == newFake){
+                square.classList.add("fake");
+            }
+            square.style.backgroundColor = `hsl(${color[0]}, ${color[1]}%, ${color[2]}%)`;
+            if(square.classList.contains("fake")){
+                let diferencia = (150/(score==0 ? 0.1 : score));
+                if(Math.random()<0.5){
+                    square.style.backgroundColor = `hsl(${color[0]}, ${color[1]}%, ${color[2]+diferencia}%)`;
+                } else {
+                    square.style.backgroundColor = `hsl(${color[0]}, ${color[1]}%, ${color[2]-diferencia}%)`;
+                }
+            }
+        })
+    }
+</script>
+
+<style>
+    * {
+        box-sizing: border-box;
+    }
+    .score{
+        display:flex;
+        justify-content: center;
+        font-size:150%;
+        color:aqua;
+    }
+    .square {
+        padding:25%;
+        background-color: hsl(0, 100%, 50%);
+    }
+    .grid {
+        display:grid;
+        gap: 2%;
+        grid-template-columns: repeat(3, auto);
+    }
+    .fake {
+        background-color: hsl(0, 100%, 20%);
+    }
+</style>
