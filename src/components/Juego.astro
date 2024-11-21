@@ -1,5 +1,4 @@
 ---
-
 ---
 <div class="score"> <p>Puntuación:</p><p class="scorenumber">0</p> </div>
 
@@ -10,11 +9,36 @@
 </div>
 
 <script>
-
+    const MINDIFFICULTY = 10;
+    const grid = document.querySelector<HTMLElement>(".grid");
     let Squares = document.querySelectorAll<HTMLElement>(".square");
-    const ScoreNumber = document.querySelector(".scorenumber");
+    const ScoreNumber = document.querySelector<HTMLElement>(".scorenumber");
     let score = 0;
-
+    function comprobarPuntuacion(){
+        if(score%10==0){
+            let sqr = Math.sqrt(grid!.childElementCount);
+            let nuevos = ((sqr+1) * (sqr+1)) - (grid!.childElementCount)
+            for(let i = 0;i<nuevos;i++){
+                let clone = Squares[0].cloneNode(true)
+                clone = clone as HTMLElement;
+                clone.addEventListener('click',() => {
+                    //@ts-expect-error
+                    if(clone.classList.contains("fake")){
+                        score++;
+                        comprobarPuntuacion();
+                    } else {
+                        score = 0;
+                        reiniciarJuego();
+                    }
+                    actualizarPuntuacion();
+                    reiniciarColores();
+                })
+                grid?.appendChild(clone);
+            }
+            Squares = document.querySelectorAll(".square");
+            grid!.style.gridTemplateColumns = `repeat(${sqr+1}, auto)`;
+        }
+    }
     function actualizarPuntuacion(){
         ScoreNumber!.textContent = score.toString();
     }
@@ -22,19 +46,14 @@
     function generarColor(){
         return [Math.random()*360, 50, Math.floor(Math.random() * (75 - 25 + 1) + 25)]
     }
-
-    Squares.forEach((square) => {
-        square.addEventListener('click',() => {
-            if(square.classList.contains("fake")){
-                score++;
-            } else {
-                score = 0;
-            }
-            actualizarPuntuacion();
-            reiniciar();
-        })
-    })
-    function reiniciar(){
+    function reiniciarJuego(){
+        while(Squares.length!==9){
+            Squares[0].remove();
+            Squares = document.querySelectorAll<HTMLElement>(".square");
+        }
+        grid!.style.gridTemplateColumns = `repeat(3, auto)`;
+    }
+    function reiniciarColores(){
         const color = generarColor();
         const newFake = Math.floor(Math.random()*Squares.length);
         Squares.forEach((square,index) => {
@@ -44,7 +63,7 @@
             }
             square.style.backgroundColor = `hsl(${color[0]}, ${color[1]}%, ${color[2]}%)`;
             if(square.classList.contains("fake")){
-                let diferencia = (150/(score==0 ? 0.1 : score));
+                let diferencia = Math.max((150/(score<MINDIFFICULTY ? MINDIFFICULTY : score)),1);
                 if(Math.random()<0.5){
                     square.style.backgroundColor = `hsl(${color[0]}, ${color[1]}%, ${color[2]+diferencia}%)`;
                 } else {
@@ -53,6 +72,21 @@
             }
         })
     }
+
+    Squares.forEach((square) => {
+        square.addEventListener('click',() => {
+            if(square.classList.contains("fake")){
+                score++;
+                comprobarPuntuacion();
+            } else {
+                score = 0;
+                reiniciarJuego();
+            }
+            actualizarPuntuacion();
+            reiniciarColores();
+        })
+    })
+    reiniciarColores();
 </script>
 
 <style>
@@ -67,7 +101,7 @@
     }
     .square {
         padding:25%;
-        background-color: hsl(0, 100%, 50%);
+        background-color: hsla(0, 100%, 50%,0);
     }
     .grid {
         display:grid;
@@ -75,6 +109,6 @@
         grid-template-columns: repeat(3, auto);
     }
     .fake {
-        background-color: hsl(0, 100%, 20%);
+        background-color: hsla(0, 100%, 20%,0);
     }
 </style>
